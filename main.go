@@ -14,6 +14,11 @@ func main() {
 		fmt.Println("too many arguments provided")
 		os.Exit(1)
 	}
-	baseRawURL := os.Args[1]
-	fmt.Printf("starting crawl of: %s...\n", baseRawURL)
+	rawBaseURL := os.Args[1]
+	fmt.Printf("starting crawl of: %s...\n", rawBaseURL)
+	htmlContent, err := getHTML(rawBaseURL)
+	if err != nil {
+		fmt.Printf("getHTML: %v\n", err)
+	}
+	fmt.Println(htmlContent)
 }
