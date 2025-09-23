@@ -16,9 +16,13 @@ func main() {
 	}
 	rawBaseURL := os.Args[1]
 	fmt.Printf("starting crawl of: %s...\n", rawBaseURL)
-	htmlContent, err := getHTML(rawBaseURL)
-	if err != nil {
-		fmt.Printf("getHTML: %v\n", err)
+
+	pages := make(map[string]int)
+	crawlPage(rawBaseURL, rawBaseURL, pages)
+	fmt.Printf("Crawl of %s completed\n", rawBaseURL)
+
+	fmt.Println("Results:")
+	for page, count := range pages {
+		fmt.Printf(" - %s linked: %d times\n", page, count)
 	}
-	fmt.Println(htmlContent)
 }
