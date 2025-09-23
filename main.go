@@ -22,7 +22,7 @@ func main() {
 	fmt.Printf("Crawl of %s completed\n", rawBaseURL)
 
 	fmt.Println("Results:")
-	for page, count := range pages {
-		fmt.Printf(" - %s linked: %d times\n", page, count)
+	for normalizedURL, count := range pages {
+		fmt.Printf(" - %s linked: %d times\n", normalizedURL, count)
 	}
 }
