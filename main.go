@@ -17,12 +17,21 @@ func main() {
 	rawBaseURL := os.Args[1]
 	fmt.Printf("starting crawl of: %s...\n", rawBaseURL)
 
-	pages := make(map[string]int)
-	crawlPage(rawBaseURL, rawBaseURL, pages)
+	config, err := defaultConfig(rawBaseURL, 1)
+	if err != nil {
+		fmt.Printf("Cound't build config: %v", err)
+		os.Exit(1)
+	}
+	config.wg.Go(func() {
+		config.crawlPage(rawBaseURL)
+	})
+
+	config.wg.Wait()
+
 	fmt.Printf("Crawl of %s completed\n", rawBaseURL)
 
 	fmt.Println("Results:")
-	for normalizedURL, count := range pages {
-		fmt.Printf(" - %s linked: %d times\n", normalizedURL, count)
+	for normalizedURL, pageData := range config.pages {
+		fmt.Printf(" - %s linked: times %d\n", normalizedURL, pageData.Visits)
 	}
 }

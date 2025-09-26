@@ -28,7 +28,7 @@ func getHTML(rawURL string) (string, error) {
 		return "", fmt.Errorf("error response status: %v, %q", resp.StatusCode, http.StatusText(resp.StatusCode))
 	}
 	if contentType := resp.Header.Get("Content-Type"); !strings.Contains(contentType, "text/html") {
-		return "", fmt.Errorf("error response Content-Type: %s ", contentType)
+		return "", fmt.Errorf("error: %q response Content-Type: %s ", rawURL, contentType)
 	}
 
 	htmlBodyBytes, err := io.ReadAll(resp.Body)
