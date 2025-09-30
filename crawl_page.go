@@ -82,5 +82,7 @@ func (cfg *config) addPageVisit(normalizedURL string) bool {
 		cfg.pages[normalizedURL].Visits += 1
 		return false
 	}
+
+	cfg.pages[normalizedURL] = &PageData{}
 	return true
 }
