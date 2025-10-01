@@ -61,7 +61,12 @@ func main() {
 	fmt.Printf("Crawl of %s completed\n", rawBaseURL)
 	fmt.Println("Writing report...")
 
-	writeCSVReport(config.pages, defaultReportFileName)
+	err = writeCSVReport(config.pages, defaultReportFileName)
+	if err != nil {
+		fmt.Printf("Error writing report: %v\n", err)
+		os.Exit(1)
+	}
+
 	fmt.Printf("Report written to: %s\n", defaultReportFileName)
 }
 
