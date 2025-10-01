@@ -52,9 +52,3 @@ func (cfg *config) crawlPage(rawCurrentURL string) {
 		go cfg.crawlPage(nextURL)
 	}
 }
-
-func (cfg *config) reachedMaxPages() bool {
-	cfg.mu.Lock()
-	defer cfg.mu.Unlock()
-	return len(cfg.pages) >= cfg.maxPages
-}

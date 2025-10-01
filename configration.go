@@ -45,3 +45,9 @@ func (cfg *config) addPageVisit(normalizedURL string) bool {
 	}
 	return true
 }
+
+func (cfg *config) reachedMaxPages() bool {
+	cfg.mu.Lock()
+	defer cfg.mu.Unlock()
+	return len(cfg.pages) >= cfg.maxPages
+}

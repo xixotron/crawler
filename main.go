@@ -11,20 +11,22 @@ func main() {
 	const defaultMaxConcurency = 5
 	const defaultMaxPages = 20
 
+	maxConcurency := defaultMaxConcurency
+	maxPages := defaultMaxPages
+
 	if len(os.Args) < 2 {
 		fmt.Println("no URL provided")
 		print_usage()
 		os.Exit(1)
 	}
-
 	if len(os.Args) > 4 {
 		fmt.Println("too many arguments provided")
 		print_usage()
 		os.Exit(1)
 	}
+
 	rawBaseURL := os.Args[1]
-	maxConcurency := defaultMaxConcurency
-	maxPages := defaultMaxPages
+
 	if len(os.Args) > 2 {
 		n, err := strconv.Atoi(os.Args[2])
 		if err != nil {
@@ -34,9 +36,8 @@ func main() {
 		}
 		maxConcurency = n
 	}
-
 	if len(os.Args) > 3 {
-		n, err := strconv.Atoi(os.Args[2])
+		n, err := strconv.Atoi(os.Args[3])
 		if err != nil {
 			fmt.Printf("invalid maxPages value: %v\n", err)
 			print_usage()
@@ -45,9 +46,8 @@ func main() {
 		maxPages = n
 	}
 
-	fmt.Printf("starting crawl of: %q...\n", rawBaseURL)
-
 	config, err := configure(rawBaseURL, maxConcurency, maxPages)
+	fmt.Printf("starting crawl of: %q with maxConcurency: %d, maxPages: %d ...\n", config.baseURL.String(), cap(config.concurrencyControl), config.maxPages)
 	if err != nil {
 		fmt.Printf("Cound't build config: %v", err)
 		os.Exit(1)
