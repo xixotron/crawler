@@ -19,7 +19,7 @@ func main() {
 	rawBaseURL := os.Args[1]
 	fmt.Printf("starting crawl of: %q...\n", rawBaseURL)
 
-	config, err := defaultConfig(rawBaseURL, maxConcurency)
+	config, err := configure(rawBaseURL, maxConcurency)
 	if err != nil {
 		fmt.Printf("Cound't build config: %v", err)
 		os.Exit(1)
