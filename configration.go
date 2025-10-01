@@ -11,10 +11,11 @@ type config struct {
 	baseURL            *url.URL
 	mu                 *sync.Mutex
 	concurrencyControl chan struct{}
+	maxPages           int
 	wg                 *sync.WaitGroup
 }
 
-func configure(rawBaseURL string, concurrntProcesses int) (*config, error) {
+func configure(rawBaseURL string, concurrentProcesses, maxPages int) (*config, error) {
 	baseURL, err := url.Parse(rawBaseURL)
 	if err != nil {
 		return nil, fmt.Errorf("error Couldn't parse baseURL %q: %v", rawBaseURL, err)
@@ -23,7 +24,8 @@ func configure(rawBaseURL string, concurrntProcesses int) (*config, error) {
 		pages:              make(map[string]PageData),
 		baseURL:            baseURL,
 		mu:                 &sync.Mutex{},
-		concurrencyControl: make(chan struct{}, concurrntProcesses),
+		maxPages:           maxPages,
+		concurrencyControl: make(chan struct{}, concurrentProcesses),
 		wg:                 &sync.WaitGroup{},
 	}, nil
 }
