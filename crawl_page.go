@@ -8,7 +8,7 @@ import (
 )
 
 type config struct {
-	pages              map[string]*PageData
+	pages              map[string]PageData
 	baseURL            *url.URL
 	mu                 *sync.Mutex
 	concurrencyControl chan struct{}
@@ -21,7 +21,7 @@ func defaultConfig(rawBaseURL string, concurrntProcesses int) (*config, error) {
 		return nil, fmt.Errorf("error Couldn't parse baseURL %q: %v", rawBaseURL, err)
 	}
 	return &config{
-		pages:              make(map[string]*PageData),
+		pages:              make(map[string]PageData),
 		baseURL:            baseURL,
 		mu:                 &sync.Mutex{},
 		concurrencyControl: make(chan struct{}, concurrntProcesses),
@@ -31,6 +31,12 @@ func defaultConfig(rawBaseURL string, concurrntProcesses int) (*config, error) {
 }
 
 func (cfg *config) crawlPage(rawCurrentURL string) {
+	cfg.concurrencyControl <- struct{}{}
+	defer func() {
+		<-cfg.concurrencyControl
+		cfg.wg.Done()
+	}()
+
 	currentURL, err := url.Parse(rawCurrentURL)
 	if err != nil {
 		log.Printf("error crawlPage: Couldn't parse currentURL %q: %v", rawCurrentURL, err)
@@ -51,7 +57,7 @@ func (cfg *config) crawlPage(rawCurrentURL string) {
 		return
 	}
 
-	log.Printf("crawling: %s", rawCurrentURL)
+	log.Printf("Crawling: %q, normalized as: %q", currentURL.String(), normalizedURL)
 
 	html, err := getHTML(rawCurrentURL)
 	if err != nil {
@@ -60,18 +66,18 @@ func (cfg *config) crawlPage(rawCurrentURL string) {
 	}
 
 	pageData := extractPageData(html, rawCurrentURL)
-	pageData.Visits = 1
-	cfg.mu.Lock()
-	cfg.pages[normalizedURL] = &pageData
-	cfg.mu.Unlock()
+	cfg.setPageData(normalizedURL, pageData)
 
 	for _, nextURL := range pageData.OutgoingLinks {
-		cfg.concurrencyControl <- struct{}{}
-		cfg.wg.Go(func() {
-			cfg.crawlPage(nextURL)
-		})
-		<-cfg.concurrencyControl
+		cfg.wg.Add(1)
+		go cfg.crawlPage(nextURL)
 	}
+}
+
+func (cfg *config) setPageData(normalizedURL string, pageData PageData) {
+	cfg.mu.Lock()
+	defer cfg.mu.Unlock()
+	cfg.pages[normalizedURL] = pageData
 }
 
 func (cfg *config) addPageVisit(normalizedURL string) bool {
@@ -79,10 +85,7 @@ func (cfg *config) addPageVisit(normalizedURL string) bool {
 	defer cfg.mu.Unlock()
 
 	if _, ok := cfg.pages[normalizedURL]; ok {
-		cfg.pages[normalizedURL].Visits += 1
 		return false
 	}
-
-	cfg.pages[normalizedURL] = &PageData{}
 	return true
 }

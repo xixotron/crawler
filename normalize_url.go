@@ -19,6 +19,9 @@ func normalizeURL(rawURL string) (string, error) {
 	if url.Path[len(url.Path)-1] == '/' {
 		url.Path = url.Path[:len(url.Path)-1]
 	}
+	if url.Path == "." {
+		url.Path = ""
+	}
 	url.Host = strings.ToLower(url.Host)
 
 	return url.Host + url.Path, nil

@@ -31,6 +31,10 @@ func Test_normalizeURL(t *testing.T) {
 			inputURL: "http://BLOG.BOOT.DEV/path",
 			expected: "blog.boot.dev/path",
 		},
+		"base url without path": {
+			inputURL: "https://wagslane.dev",
+			expected: "wagslane.dev",
+		},
 	}
 
 	for name, tc := range tests {
