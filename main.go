@@ -10,6 +10,7 @@ import (
 func main() {
 	const defaultMaxConcurency = 5
 	const defaultMaxPages = 20
+	const defaultReportFileName = "report.csv"
 
 	maxConcurency := defaultMaxConcurency
 	maxPages := defaultMaxPages
@@ -58,11 +59,10 @@ func main() {
 	config.wg.Wait()
 
 	fmt.Printf("Crawl of %s completed\n", rawBaseURL)
+	fmt.Println("Writing report...")
 
-	fmt.Println("Results:")
-	for normalizedURL := range config.pages {
-		fmt.Printf(" - %s visited\n", normalizedURL)
-	}
+	writeCSVReport(config.pages, defaultReportFileName)
+	fmt.Printf("Report written to: %s\n", defaultReportFileName)
 }
 
 func print_usage() {
